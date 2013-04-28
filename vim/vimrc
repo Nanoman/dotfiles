@@ -1,0 +1,183 @@
+"Sin compatibilidad con vi
+set nocompatible
+
+"Cargamos Neobundle para manejar los plugins
+if has('vim_starting')
+   set runtimepath+=~/.vim/bundle/neobundle/
+endif
+
+"Los habilitamos todos.
+call neobundle#rc(expand('~/.vim/bundle/'))
+
+"Plugin - Neobundle
+NeoBundleFetch 'Shougo/neobundle.vim'
+
+"Plugin - Sparkup
+NeoBundle 'rstacruz/sparkup', {'rtp': 'vim/'}
+
+"Plugin - Command-t
+NeoBundle 'git://git.wincent.com/command-t.git'
+
+"Plugin - DelimitMate
+NeoBundle 'Raimondi/delimitMate'
+
+"Plugin - Closetag
+NeoBundle 'docunext/closetag.vim'
+
+"Plugin - Nerd comenter
+NeoBundle 'scrooloose/nerdcommenter'
+
+"Plugin - NerdTree
+NeoBundle 'scrooloose/nerdtree'
+
+"Plugin - SuperTab
+NeoBundle 'ervandew/supertab'
+
+"Plugin - Tagbar
+NeoBundle 'majutsushi/tagbar'
+
+"Plugin - Solarized
+NeoBundle 'altercation/vim-colors-solarized'
+
+"Plugin - Surround
+NeoBundle 'tpope/vim-surround'
+
+"Plugin - SnipMate
+NeoBundle 'msanders/snipmate.vim'
+
+NeoBundleCheck
+
+
+"Arreglar tonteria con las indentaciones
+set backspace=indent,eol,start
+
+"En un terminal gnome podemos utilizar 256 colores
+set t_Co=256
+
+"Mapeamos algunas PFKeys con el plugin que deseamos
+map <F2> :CommandT<CR>
+
+map <F3> :NERDTree<CR>
+
+"Podemos utilizar el mouse en cualquier lugar
+set mouse=a
+"Pero no queremos ver el mouse cuando escribimos
+set mousehide
+set mousemodel=popup
+"El boton central del mouse servira para realizar un paste
+map <MouseMiddle> <Esc>"*p
+
+"Mejores modos. Recordaremos donde estamos...
+set viminfo=!,'100,\"100,:20,<50,s10,h,n~/.viminfo'
+
+"Por favor un ficherito de undo por si las moscas (Vim 7.3 solamente)
+set undodir=~/.vim/undodir
+set undofile
+
+"Colorearemos la sintaxis 
+syntax on
+if has("gui_running")
+	set guifont=Mensch\ 10
+else
+	colorscheme darkblue
+endif
+
+set background=dark
+let g:solarized_termtrans=1
+let g:solarized_termcolors=256
+let g:solarized_contrast="high"
+let g:solarized_visibility="high"
+colorscheme darkblue
+
+"Permitimos buffers ocultos
+set hidden
+
+"Titulo si se ejecuta desde terminal
+set title
+set titleold="Terminal"
+set titlestring=%F\ -\ Vim
+
+"Habilitamos los plugins de tipo fichero e indentacion
+filetype on
+filetype plugin on
+
+"Destacar la linea actual
+if has("gui_running")
+	set cursorline
+endif
+
+set ttyfast
+
+" Customizar el menu de tipos de fichero
+set wildmenu
+set wildignore=*.dll,*.o,*.pyc,*.bak,*.exe,*.jpg,*.jpeg,*.png,*.gif,*$py.class,*.class
+set wildmode=list:full
+
+
+" Utilizaremos el smartindent si no hay ningun pliguin de indentacion
+set autoindent  smartindent
+" But don't outdent hashes
+inoremap # #
+
+" Global by default
+set gdefault
+
+" Better Search
+set hlsearch
+set incsearch
+set showmatch
+set enc=utf-8
+
+"Soporte para ruby
+autocmd FileType ruby setlocal expandtab shiftwidth=2 tabstop=2 colorcolumn=79
+
+fun! SelectHTML()
+     let n = 1
+     while n < 50 && n < line("$")
+	"Por si se trata de jinja
+	if getline(n) =~ '{%\s*\(extends\|block\|macro\|set\|if\|for\|include\|trans\)\>'
+	   set ft=htmljinja
+	   return
+	endif
+	"Por si se trata de mako
+        if getline(n) =~ '<%\(def\|inherit\)'
+           set ft=mako
+           return
+        endif
+	"Por si se trata de genshi
+        if getline(n) =~ 'xmlns:py\|py:\(match\|for\|if\|def\|strip\|xmlns\)'
+	   set ft=genshi
+	   return
+	endif
+	let n = n + 1
+     endwhile
+     set ft=html
+endfun
+
+autocmd FileType html,xhtml,xml,htmldjango,htmljinja,eruby,mako setlocal expandtab shiftwidth=2 tabstop=2 softtabstop=2
+autocmd BufNewFile,BufRead *.rhtml setlocal ft=eruby
+autocmd BufNewFile,BufRead *.mako setlocal ft=mako
+autocmd BufNewFile,BufRead *.tmpl setlocal ft=htmljinja
+autocmd BufNewFile,BufRead *.py_tmpl setlocal ft=python
+autocmd BufNewFile,BufRead *.html,*.htm  call SelectHTML()
+let html_no_rendering=1
+
+autocmd FileType html,htmldjango,jinjahtml,eruby,mako let b:closetag_html_style=1
+autocmd FileType html,xhtml,xml,htmldjango,jinjahtml,eruby,mako source ~/.vim/bundle/closetag.vim/plugin/closetag.vim
+
+"CSS
+autocmd FileType css setlocal expandtab shiftwidth=4 tabstop=4 softtabstop=4
+
+"Markdown
+autocmd BufNewFile,BufRead *.txt,*.markdown,*.md setlocal ft=markdown colorcolumn=79
+autocmd FileType rst setlocal expandtab shiftwidth=4 tabstop=4 softtabstop=4 colorcolumn=79
+
+"vim
+autocmd FileType vim setlocal expandtab shiftwidth=2 tabstop=8 softtabstop=2
+
+"Javascript
+autocmd FileType javascript setlocal expandtab shiftwidth=2 tabstop=2 softtabstop=2 colorcolumn=79
+let javascript_enable_domhtmlcss=1
+
+"I fins aqui tot gracies a
+"https://github.com/mnazim/dotfiles/blob/master/vim/vimrc#L315
